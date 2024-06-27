@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: song-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/songdb
+    username: ${SONG_DB_USERNAME}
+    password: ${SONG_DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8081
