@@ -1,0 +1,71 @@
+version: '3'
+services:
+  song-service:
+    container_name: song-service
+    build:
+      context: ./song-service
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_PORT=${SONG_SERVICE_SERVER_PORT}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://song_service_postgres_container:${POSTGRES_PORT}/songdb
+      - SONG_DB_USERNAME=${SONG_SERVICE_POSTGRES_USER}
+      - SONG_DB_PASSWORD=${SONG_SERVICE_POSTGRES_PASSWORD}
+    ports:
+      - "${SONG_SERVICE_SERVER_PORT}:${SONG_SERVICE_SERVER_PORT}"
+    networks:
+      - song_platform_network
+    depends_on:
+      - song_service_postgres_container
+
+  song_service_postgres_container:
+    image: postgres:12.19-alpine3.20
+    environment:
+      POSTGRES_USER: ${SONG_SERVICE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${SONG_SERVICE_POSTGRES_PASSWORD}
+      POSTGRES_DB: songdb
+    ports:
+      - "${SONG_SERVICE_POSTGRES_EXPLORE_PORT}:${POSTGRES_PORT}"
+    networks:
+      - song_platform_network
+    volumes:
+      - song-service-postgres-data:/var/lib/postgresql/data
+
+  resource-service:
+    container_name: resource-service
+    build:
+      context: ./resource-service
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_PORT=${RESOURCE_SERVICE_SERVER_PORT}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://resource_service_postgres_container:${POSTGRES_PORT}/resourcedb
+      - RESOURCE_DB_USERNAME=${RESOURCE_SERVICE_POSTGRES_USER}
+      - RESOURCE_DB_PASSWORD=${RESOURCE_SERVICE_POSTGRES_PASSWORD}
+      - SONG_SERVICE_URL=http://song-service:${SONG_SERVICE_SERVER_PORT}/songs
+    ports:
+      - "${RESOURCE_SERVICE_SERVER_PORT}:${RESOURCE_SERVICE_SERVER_PORT}"
+    networks:
+      - song_platform_network
+    depends_on:
+      - resource_service_postgres_container
+      - song-service
+
+  resource_service_postgres_container:
+    image: postgres:12.19-alpine3.20
+    environment:
+      POSTGRES_USER: ${RESOURCE_SERVICE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${RESOURCE_SERVICE_POSTGRES_PASSWORD}
+      POSTGRES_DB: resourcedb
+    ports:
+      - "${RESOURCE_SERVICE_POSTGRES_EXPLORE_PORT}:${POSTGRES_PORT}"
+    networks:
+      - song_platform_network
+    volumes:
+      - resource-service-postgres-data:/var/lib/postgresql/data
+
+networks:
+  song_platform_network:
+    driver: bridge
+
+volumes:
+  song-service-postgres-data:
+  resource-service-postgres-data:

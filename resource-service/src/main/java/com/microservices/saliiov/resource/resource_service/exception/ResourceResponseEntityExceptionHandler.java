@@ -11,7 +11,7 @@ public class ResourceResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {ResourceValidationException.class})
     public ResponseEntity<ResponseError> handleResourceCreationException(ResourceValidationException e) {
-        log.error("ResourceCreationException: {}", e.getMessage());
+        log.error("ResourceCreationException", e);
         return ResponseEntity.badRequest()
                 .body(ResponseError.builder()
                         .message(e.getMessage())
@@ -20,7 +20,7 @@ public class ResourceResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<ResponseError> handleException(Exception e) {
-        log.error("Exception: {}", e.getMessage());
+        log.error("Exception", e);
         return ResponseEntity.internalServerError()
                 .body(ResponseError.builder()
                         .message(e.getMessage())

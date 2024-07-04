@@ -11,7 +11,7 @@ public class SongResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {SongValidationException.class})
     public ResponseEntity<ResponseError> handleSongValidationException(SongValidationException e) {
-        log.error("SongValidationException: {}", e.getMessage());
+        log.error("SongValidationException", e);
         return ResponseEntity.badRequest()
                 .body(ResponseError.builder()
                         .message(e.getMessage())
@@ -20,7 +20,7 @@ public class SongResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<ResponseError> handleException(Exception e) {
-        log.error("Exception: {}", e.getMessage());
+        log.error("Exception", e);
         return ResponseEntity.internalServerError()
                 .body(ResponseError.builder()
                         .message(e.getMessage())
