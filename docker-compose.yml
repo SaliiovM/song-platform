@@ -1,66 +1,72 @@
 version: '3'
 services:
-  song-service:
-    container_name: song-service
-    build:
-      context: ./song-service
-      dockerfile: Dockerfile
-    environment:
-      - SERVER_PORT=${SONG_SERVICE_SERVER_PORT}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://song_service_postgres_container:${POSTGRES_PORT}/songdb
-      - SONG_DB_USERNAME=${SONG_SERVICE_POSTGRES_USER}
-      - SONG_DB_PASSWORD=${SONG_SERVICE_POSTGRES_PASSWORD}
-    ports:
-      - "${SONG_SERVICE_SERVER_PORT}:${SONG_SERVICE_SERVER_PORT}"
-    networks:
-      - song_platform_network
-    depends_on:
-      - song_service_postgres_container
-
-  song_service_postgres_container:
-    image: postgres:12.19-alpine3.20
-    environment:
-      POSTGRES_USER: ${SONG_SERVICE_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${SONG_SERVICE_POSTGRES_PASSWORD}
-      POSTGRES_DB: songdb
-    ports:
-      - "${SONG_SERVICE_POSTGRES_EXPLORE_PORT}:${POSTGRES_PORT}"
-    networks:
-      - song_platform_network
-    volumes:
-      - song-service-postgres-data:/var/lib/postgresql/data
-
-  resource-service:
-    container_name: resource-service
+  resource-svc:
+    container_name: resource-svc
     build:
       context: ./resource-service
       dockerfile: Dockerfile
     environment:
-      - SERVER_PORT=${RESOURCE_SERVICE_SERVER_PORT}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://resource_service_postgres_container:${POSTGRES_PORT}/resourcedb
-      - RESOURCE_DB_USERNAME=${RESOURCE_SERVICE_POSTGRES_USER}
-      - RESOURCE_DB_PASSWORD=${RESOURCE_SERVICE_POSTGRES_PASSWORD}
-      - SONG_SERVICE_URL=http://song-service:${SONG_SERVICE_SERVER_PORT}/songs
+      - RESOURCE_SVC_PORT=${RESOURCE_SVC_PORT}
+      - RESOURCE_DB_HOST=resource-svc-db
+      - RESOURCE_DB_PORT=${RESOURCE_DB_SVC_PORT}
+      - RESOURCE_DB_USERNAME=${RESOURCE_DB_USER}
+      - RESOURCE_DB_PASSWORD=${RESOURCE_DB_PASS}
+      - SONG_SVC_HOST=song-svc
     ports:
-      - "${RESOURCE_SERVICE_SERVER_PORT}:${RESOURCE_SERVICE_SERVER_PORT}"
+      - "${RESOURCE_SVC_PORT}:${RESOURCE_SVC_PORT}"
     networks:
       - song_platform_network
     depends_on:
-      - resource_service_postgres_container
-      - song-service
+      - resource-svc-db
+      - song-svc
 
-  resource_service_postgres_container:
+  resource-svc-db:
+    container_name: resource-svc-db
     image: postgres:12.19-alpine3.20
     environment:
-      POSTGRES_USER: ${RESOURCE_SERVICE_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${RESOURCE_SERVICE_POSTGRES_PASSWORD}
+      POSTGRES_USER: ${RESOURCE_DB_USER}
+      POSTGRES_PASSWORD: ${RESOURCE_DB_PASS}
       POSTGRES_DB: resourcedb
     ports:
-      - "${RESOURCE_SERVICE_POSTGRES_EXPLORE_PORT}:${POSTGRES_PORT}"
+      - "${RESOURCE_DB_EXP_PORT}:${RESOURCE_DB_SVC_PORT}"
     networks:
       - song_platform_network
     volumes:
+      - ./resource-service/init-db:/docker-entrypoint-initdb.d
       - resource-service-postgres-data:/var/lib/postgresql/data
+
+  song-svc:
+    container_name: song-svc
+    build:
+      context: ./song-service
+      dockerfile: Dockerfile
+    environment:
+      - SONG_SVC_PORT=${SONG_SVC_PORT}
+      - SONG_DB_HOST=song-svc-db
+      - SONG_DB_PORT=${SONG_DB_SVC_PORT}
+      - SONG_DB_USERNAME=${SONG_DB_USER}
+      - SONG_DB_PASSWORD=${SONG_DB_PASS}
+    ports:
+      - "${SONG_SVC_PORT}:${SONG_SVC_PORT}"
+    networks:
+      - song_platform_network
+    depends_on:
+      - song-svc-db
+
+  song-svc-db:
+    container_name: song-svc-db
+    image: postgres:12.19-alpine3.20
+    environment:
+      POSTGRES_USER: ${SONG_DB_USER}
+      POSTGRES_PASSWORD: ${SONG_DB_PASS}
+      POSTGRES_DB: songdb
+    ports:
+      - "${SONG_DB_EXP_PORT}:${SONG_DB_SVC_PORT}"
+    networks:
+      - song_platform_network
+    volumes:
+      - ./song-service/init-db:/docker-entrypoint-initdb.d
+      - song-service-postgres-data:/var/lib/postgresql/data
 
 networks:
   song_platform_network:

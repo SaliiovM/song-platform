@@ -2,7 +2,7 @@ spring:
   application:
     name: song-service
   datasource:
-    url: jdbc:postgresql://localhost:5433/songdb
+    url: jdbc:postgresql://${SONG_DB_HOST:localhost}:${SONG_DB_PORT:5433}/songdb
     username: ${SONG_DB_USERNAME}
     password: ${SONG_DB_PASSWORD}
   jpa:
@@ -15,4 +15,4 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
-  port: ${SERVER_PORT}
+  port: ${SONG_SVC_PORT:8081}
