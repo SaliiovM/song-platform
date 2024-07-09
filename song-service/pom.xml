@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.microservices.saliiov.song</groupId>
 	<artifactId>song-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>song-service</name>
 	<description>Song Service</description>
 

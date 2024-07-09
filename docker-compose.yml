@@ -1,0 +1,77 @@
+version: '3'
+services:
+  resource-svc:
+    container_name: resource-svc
+    build:
+      context: ./resource-service
+      dockerfile: Dockerfile
+    environment:
+      - RESOURCE_SVC_PORT=${RESOURCE_SVC_PORT}
+      - RESOURCE_DB_HOST=resource-svc-db
+      - RESOURCE_DB_PORT=${RESOURCE_DB_SVC_PORT}
+      - RESOURCE_DB_USERNAME=${RESOURCE_DB_USER}
+      - RESOURCE_DB_PASSWORD=${RESOURCE_DB_PASS}
+      - SONG_SVC_HOST=song-svc
+    ports:
+      - "${RESOURCE_SVC_PORT}:${RESOURCE_SVC_PORT}"
+    networks:
+      - song_platform_network
+    depends_on:
+      - resource-svc-db
+      - song-svc
+
+  resource-svc-db:
+    container_name: resource-svc-db
+    image: postgres:12.19-alpine3.20
+    environment:
+      POSTGRES_USER: ${RESOURCE_DB_USER}
+      POSTGRES_PASSWORD: ${RESOURCE_DB_PASS}
+      POSTGRES_DB: resourcedb
+    ports:
+      - "${RESOURCE_DB_EXP_PORT}:${RESOURCE_DB_SVC_PORT}"
+    networks:
+      - song_platform_network
+    volumes:
+      - ./resource-service/init-db:/docker-entrypoint-initdb.d
+      - resource-service-postgres-data:/var/lib/postgresql/data
+
+  song-svc:
+    container_name: song-svc
+    build:
+      context: ./song-service
+      dockerfile: Dockerfile
+    environment:
+      - SONG_SVC_PORT=${SONG_SVC_PORT}
+      - SONG_DB_HOST=song-svc-db
+      - SONG_DB_PORT=${SONG_DB_SVC_PORT}
+      - SONG_DB_USERNAME=${SONG_DB_USER}
+      - SONG_DB_PASSWORD=${SONG_DB_PASS}
+    ports:
+      - "${SONG_SVC_PORT}:${SONG_SVC_PORT}"
+    networks:
+      - song_platform_network
+    depends_on:
+      - song-svc-db
+
+  song-svc-db:
+    container_name: song-svc-db
+    image: postgres:12.19-alpine3.20
+    environment:
+      POSTGRES_USER: ${SONG_DB_USER}
+      POSTGRES_PASSWORD: ${SONG_DB_PASS}
+      POSTGRES_DB: songdb
+    ports:
+      - "${SONG_DB_EXP_PORT}:${SONG_DB_SVC_PORT}"
+    networks:
+      - song_platform_network
+    volumes:
+      - ./song-service/init-db:/docker-entrypoint-initdb.d
+      - song-service-postgres-data:/var/lib/postgresql/data
+
+networks:
+  song_platform_network:
+    driver: bridge
+
+volumes:
+  song-service-postgres-data:
+  resource-service-postgres-data:

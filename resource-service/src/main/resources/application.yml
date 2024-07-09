@@ -2,7 +2,7 @@ spring:
   application:
     name: resource-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/resourcedb
+    url: jdbc:postgresql://${RESOURCE_DB_HOST:localhost}:${RESOURCE_DB_PORT:5432}/resourcedb
     username: ${RESOURCE_DB_USERNAME}
     password: ${RESOURCE_DB_PASSWORD}
   jpa:
@@ -14,4 +14,9 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-song.service.url: http://localhost:8081/songs
+song:
+  base-url: http://${SONG_SVC_HOST:localhost}:${SONG_SVC_PORT:8081}
+  songs-endpoint: /songs
+
+server:
+  port: ${RESOURCE_SVC_PORT:8080}

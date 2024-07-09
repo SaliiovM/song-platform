@@ -6,6 +6,7 @@ import com.microservices.saliiov.resource.resource_service.exception.ResourceVal
 import com.microservices.saliiov.resource.resource_service.service.AudioService;
 import com.microservices.saliiov.resource.resource_service.service.ResourceService;
 import com.microservices.saliiov.resource.resource_service.repository.ResourceRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -32,11 +33,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ResourceServiceImpl implements ResourceService {
 
-    @Value("${song.service.url}")
-    private String targetUrl;
+    @Value("${song.base-url}")
+    private String baseUrl;
+    @Value("${song.songs-endpoint}")
+    private String songsEndpoint;
+    private String fullUrl;
     private final RestTemplate restTemplate;
     private final ResourceRepository resourceRepository;
     private final AudioService audioService;
+
+    @PostConstruct
+    public void init() {
+        fullUrl = baseUrl + songsEndpoint;
+    }
 
     @Override
     @Transactional
@@ -93,6 +102,6 @@ public class ResourceServiceImpl implements ResourceService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<SongMetadata> request = new HttpEntity<>(songMetadata, headers);
-        restTemplate.postForEntity(targetUrl, request, String.class);
+        restTemplate.postForEntity(fullUrl, request, String.class);
     }
 }
