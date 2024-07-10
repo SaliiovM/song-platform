@@ -15,8 +15,16 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 song:
-  base-url: http://${SONG_SVC_HOST:localhost}:${SONG_SVC_PORT:8081}
+  base-url: http://${SONG_SVC_HOST:localhost}
   songs-endpoint: /songs
 
 server:
   port: ${RESOURCE_SVC_PORT:8080}
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_SVC_HOST:localhost}:${EUREKA_SVC_PORT:8761}/eureka
+  instance:
+    preferIpAddress: ${EUREKA_PREFER_IP_ADDRESS:true}
