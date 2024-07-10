@@ -16,3 +16,10 @@ spring:
 
 server:
   port: ${SONG_SVC_PORT:8081}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_SVC_HOST:localhost}:${EUREKA_SVC_PORT:8761}/eureka
+  instance:
+    preferIpAddress: ${EUREKA_PREFER_IP_ADDRESS:true}
