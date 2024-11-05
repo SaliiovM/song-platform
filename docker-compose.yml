@@ -51,8 +51,8 @@ services:
       - ./resource-service/init-db:/docker-entrypoint-initdb.d
       - resource-service-postgres-data:/var/lib/postgresql/data
 
-  song-svc-1:
-    container_name: song-svc-1
+  song-svc:
+    image: song-service
     build:
       context: ./song-service
       dockerfile: Dockerfile
@@ -66,34 +66,14 @@ services:
       - EUREKA_SVC_PORT=${EUREKA_SVC_PORT}
       - EUREKA_PREFER_IP_ADDRESS=${EUREKA_PREFER_IP_ADDRESS}
     ports:
-      - "${SONG_SVC_PORT}:${SONG_SVC_PORT}"
+      - "${SONG_SVC_EXP_PORT}:${SONG_SVC_PORT}"
     networks:
       - song_platform_network
     depends_on:
       - song-svc-db
       - eureka-svc
-
-  song-svc-2:
-    container_name: song-svc-2
-    build:
-      context: ./song-service
-      dockerfile: Dockerfile
-    environment:
-      - SONG_SVC_PORT=${SONG_SVC_PORT}
-      - SONG_DB_HOST=song-svc-db
-      - SONG_DB_PORT=${SONG_DB_SVC_PORT}
-      - SONG_DB_USERNAME=${SONG_DB_USER}
-      - SONG_DB_PASSWORD=${SONG_DB_PASS}
-      - EUREKA_SVC_HOST=eureka-svc
-      - EUREKA_SVC_PORT=${EUREKA_SVC_PORT}
-      - EUREKA_PREFER_IP_ADDRESS=${EUREKA_PREFER_IP_ADDRESS}
-    ports:
-      - "${SONG_SVC_2_PORT}:${SONG_SVC_PORT}"
-    networks:
-      - song_platform_network
-    depends_on:
-      - song-svc-db
-      - eureka-svc
+    deploy:
+      replicas: 2
 
   song-svc-db:
     container_name: song-svc-db
