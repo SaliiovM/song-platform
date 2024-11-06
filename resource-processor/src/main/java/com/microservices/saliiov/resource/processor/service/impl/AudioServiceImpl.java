@@ -1,7 +1,7 @@
-package com.microservices.saliiov.resource.resource_service.service.impl;
+package com.microservices.saliiov.resource.processor.service.impl;
 
-import com.microservices.saliiov.resource.resource_service.dto.SongMetadata;
-import com.microservices.saliiov.resource.resource_service.service.AudioService;
+import com.microservices.saliiov.resource.processor.dto.SongMetadata;
+import com.microservices.saliiov.resource.processor.service.AudioService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
