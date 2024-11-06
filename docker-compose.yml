@@ -24,17 +24,21 @@ services:
       - RESOURCE_DB_PORT=${RESOURCE_DB_SVC_PORT}
       - RESOURCE_DB_USERNAME=${RESOURCE_DB_USER}
       - RESOURCE_DB_PASSWORD=${RESOURCE_DB_PASS}
-      - SONG_SVC_HOST=song-service
       - EUREKA_SVC_HOST=eureka-svc
       - EUREKA_SVC_PORT=${EUREKA_SVC_PORT}
       - EUREKA_PREFER_IP_ADDRESS=${EUREKA_PREFER_IP_ADDRESS}
+      - ACCESS_KEY=${ACCESS_KEY}
+      - SECRET_KEY=${SECRET_KEY}
+      - AWS_ENDPOINT=${AWS_ENDPOINT}:${CLOUD_PORT}
+      - S3_AUDIO_BUCKET=${S3_AUDIO_BUCKET}
     ports:
-      - "${RESOURCE_SVC_PORT}:${RESOURCE_SVC_PORT}"
+      - "${RESOURCE_SVC_EXP_PORT}:${RESOURCE_SVC_PORT}"
     networks:
       - song_platform_network
     depends_on:
       - resource-svc-db
       - eureka-svc
+      - localstack
 
   resource-svc-db:
     container_name: resource-svc-db
@@ -89,6 +93,47 @@ services:
     volumes:
       - ./song-service/init-db:/docker-entrypoint-initdb.d
       - song-service-postgres-data:/var/lib/postgresql/data
+
+  processor-svc:
+    container_name: processor-svc
+    build:
+      context: ./resource-processor
+      dockerfile: Dockerfile
+    environment:
+      - PROCESSOR_SVC_PORT=${PROCESSOR_SVC_PORT}
+    ports:
+      - "${PROCESSOR_SVC_EXP_PORT}:${PROCESSOR_SVC_PORT}"
+    networks:
+      - song_platform_network
+
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    environment:
+      - SERVICES=${SERVICES}
+      - DEFAULT_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${SECRET_KEY}
+      - PERSISTENCE=1
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+    ports:
+      - "${CLOUD_PORT}:${CLOUD_PORT}"
+    networks:
+      - song_platform_network
+
+  create-bucket:
+    image: amazon/aws-cli
+    container_name: create-bucket
+    depends_on:
+      - localstack
+    volumes:
+      - ./service-scripts/create-bucket.sh:/create-bucket.sh
+    env_file:
+      - .env
+    entrypoint: [ "/bin/sh", "-c", "sleep 10; /create-bucket.sh" ]
+    networks:
+      - song_platform_network
 
 networks:
   song_platform_network:
