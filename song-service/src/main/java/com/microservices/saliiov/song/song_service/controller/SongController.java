@@ -37,6 +37,14 @@ public class SongController {
         return songService.findSongById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/resources/{resourceId}")
+    public ResponseEntity<SongDto> getSongByResourceId(@PathVariable Long resourceId) {
+        log.debug("Executing getSongByResourceId");
+        return songService.findSongByResourceId(resourceId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
 
     }
 

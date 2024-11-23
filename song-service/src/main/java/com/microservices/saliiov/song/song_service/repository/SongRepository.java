@@ -16,4 +16,11 @@ public interface SongRepository extends CrudRepository<Song, Long> {
      * @return - Optional of Song
      */
     Optional<Song> findByNameAndSongYearAndArtist(String name, String songYear, String artist);
+
+    /**
+     * Find song by resourceId
+     * @param resourceId - song resourceId
+     * @return - Optional of Song
+     */
+    Optional<Song> findByResourceId(Long resourceId);
 }

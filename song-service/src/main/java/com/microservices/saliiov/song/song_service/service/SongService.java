@@ -25,6 +25,14 @@ public interface SongService {
     Optional<SongDto> findSongById(Long id);
 
     /**
+     * Get song by resource id
+     * @param resourceId - resource id
+     *                   (resource id is the id of the resource in the resource service)
+     * @return - song data
+     */
+    Optional<SongDto> findSongByResourceId(Long resourceId);
+
+    /**
      * Delete songs by ids
      * @param ids - ids of songs
      * @return - ids of deleted songs
