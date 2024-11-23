@@ -13,10 +13,14 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  rabbitmq:
+    host: ${MQ_HOST:localhost}
+    port: ${MQ_CLIENT_PORT:5672}
+    username: ${MQ_USER:guest}
+    password: ${MQ_PASS:guest}
 
 server:
   port: ${RESOURCE_SVC_PORT:8080}
-
 
 eureka:
   client:
@@ -40,3 +44,6 @@ cloud:
 s3:
   bucket-name: ${S3_AUDIO_BUCKET:audio-resources}
   content-type: ${S3_CONTENT_TYPE:audio/mpeg}
+
+resource:
+  queue: ${QUEUE_NAME:resource-queue}

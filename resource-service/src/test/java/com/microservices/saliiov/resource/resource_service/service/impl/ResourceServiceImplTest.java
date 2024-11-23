@@ -4,7 +4,6 @@ import com.microservices.saliiov.resource.resource_service.entity.Resource;
 import com.microservices.saliiov.resource.resource_service.exception.ResourceValidationException;
 import com.microservices.saliiov.resource.resource_service.exception.S3ProcessingException;
 import com.microservices.saliiov.resource.resource_service.repository.ResourceRepository;
-import com.microservices.saliiov.resource.resource_service.service.S3Service;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +12,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -30,9 +29,6 @@ import static org.mockito.Mockito.when;
 public class ResourceServiceImplTest {
 
     @MockBean
-    private S3Service s3Service;
-
-    @MockBean
     private ResourceRepository resourceRepository;
 
     @Autowired
@@ -41,13 +37,13 @@ public class ResourceServiceImplTest {
     @Test
     @SneakyThrows
     public void testCreateResource() {
-        byte[] mockData = "mockData".getBytes();
         Long expectedId = 1L;
         Resource mockResource = mock(Resource.class);
         when(mockResource.getId()).thenReturn(expectedId);
+        when(mockResource.getName()).thenReturn("mockData");
         when(resourceRepository.save(any(Resource.class))).thenReturn(mockResource);
 
-        Long resourceId = resourceService.createResource(mockData);
+        Long resourceId = resourceService.createResource(mockResource);
 
         verify(resourceRepository, times(1)).save(any(Resource.class));
         assertEquals(expectedId, resourceId);
@@ -55,37 +51,34 @@ public class ResourceServiceImplTest {
 
     @Test
     public void testCreateResource_WithEmptyData() {
-        byte[] emptyData = new byte[0];
-
         assertThrows(ResourceValidationException.class, () ->
-                resourceService.createResource(emptyData)
+                resourceService.createResource(null)
         );
     }
 
     @Test
     @SneakyThrows
     public void testCreateResource_WithError() {
-        byte[] mockData = "mockData".getBytes();
-        when(s3Service.uploadFile(mockData)).thenThrow(new S3ProcessingException("Error"));
+        Resource mockResource = new Resource();
+        when(resourceRepository.save(mockResource)).thenThrow(new S3ProcessingException("Error"));
 
         assertThrows(ResourceValidationException.class, () ->
-                resourceService.createResource(mockData)
+                resourceService.createResource(mockResource)
         );
     }
 
     @Test
-    public void testGetResourceDataById() {
+    public void testGetResourceById() {
         String expectedName = "mockData";
-        byte[] expectedData = expectedName.getBytes();
         Resource mockResource = mock(Resource.class);
         when(mockResource.getName()).thenReturn(expectedName);
-        when(s3Service.downloadFile(expectedName)).thenReturn(expectedData);
         when(resourceRepository.findById(anyLong())).thenReturn(Optional.of(mockResource));
 
-        byte[] actualData = resourceService.getResourceDataById(1L);
+        Optional<Resource> actualData = resourceService.getResourceById(1L);
 
         verify(resourceRepository, times(1)).findById(anyLong());
-        assertArrayEquals(expectedData, actualData);
+        assertTrue(actualData.isPresent());
+        assertEquals(expectedName, actualData.get().getName());
     }
 
     @Test

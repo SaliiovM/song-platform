@@ -31,6 +31,11 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - AWS_ENDPOINT=${AWS_ENDPOINT}
       - S3_AUDIO_BUCKET=${S3_AUDIO_BUCKET}
+      - MQ_HOST=${MQ_HOST}
+      - MQ_CLIENT_PORT=${MQ_CLIENT_PORT}
+      - MQ_USER=${MQ_USER}
+      - MQ_PASS=${MQ_PASS}
+      - QUEUE_NAME=${QUEUE_NAME}
     ports:
       - "${RESOURCE_SVC_EXP_PORT}:${RESOURCE_SVC_PORT}"
     networks:
@@ -38,6 +43,7 @@ services:
     depends_on:
       - resource-svc-db
       - eureka-svc
+      - rabbitmq-svc
 
   resource-svc-db:
     container_name: resource-svc-db
@@ -100,8 +106,27 @@ services:
       dockerfile: Dockerfile
     environment:
       - PROCESSOR_SVC_PORT=${PROCESSOR_SVC_PORT}
+      - MQ_HOST=${MQ_HOST}
+      - MQ_CLIENT_PORT=${MQ_CLIENT_PORT}
+      - MQ_USER=${MQ_USER}
+      - MQ_PASS=${MQ_PASS}
+      - QUEUE_NAME=${QUEUE_NAME}
+      - RESOURCE_SERVICE_NAME=resource-svc
+      - SONG_SERVICE_NAME=song-svc
     ports:
       - "${PROCESSOR_SVC_EXP_PORT}:${PROCESSOR_SVC_PORT}"
+    networks:
+      - song_platform_network
+    depends_on:
+      - rabbitmq-svc
+
+  rabbitmq-svc:
+    image: rabbitmq:management
+    container_name: rabbitmq-svc
+    hostname: ${MQ_HOST}
+    ports:
+      - "${MQ_CLIENT_PORT}:${MQ_CLIENT_PORT}"
+      - "${MQ_MANAGEMENT_PORT}:${MQ_MANAGEMENT_PORT}"
     networks:
       - song_platform_network
 
