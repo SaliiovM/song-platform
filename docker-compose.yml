@@ -24,15 +24,12 @@ services:
       - RESOURCE_DB_PORT=${RESOURCE_DB_SVC_PORT}
       - RESOURCE_DB_USERNAME=${RESOURCE_DB_USER}
       - RESOURCE_DB_PASSWORD=${RESOURCE_DB_PASS}
+      - SONG_SVC_HOST=song-service
       - EUREKA_SVC_HOST=eureka-svc
       - EUREKA_SVC_PORT=${EUREKA_SVC_PORT}
       - EUREKA_PREFER_IP_ADDRESS=${EUREKA_PREFER_IP_ADDRESS}
-      - ACCESS_KEY=${ACCESS_KEY}
-      - SECRET_KEY=${SECRET_KEY}
-      - AWS_ENDPOINT=${AWS_ENDPOINT}
-      - S3_AUDIO_BUCKET=${S3_AUDIO_BUCKET}
     ports:
-      - "${RESOURCE_SVC_EXP_PORT}:${RESOURCE_SVC_PORT}"
+      - "${RESOURCE_SVC_PORT}:${RESOURCE_SVC_PORT}"
     networks:
       - song_platform_network
     depends_on:
@@ -92,18 +89,6 @@ services:
     volumes:
       - ./song-service/init-db:/docker-entrypoint-initdb.d
       - song-service-postgres-data:/var/lib/postgresql/data
-
-  processor-svc:
-    container_name: processor-svc
-    build:
-      context: ./resource-processor
-      dockerfile: Dockerfile
-    environment:
-      - PROCESSOR_SVC_PORT=${PROCESSOR_SVC_PORT}
-    ports:
-      - "${PROCESSOR_SVC_EXP_PORT}:${PROCESSOR_SVC_PORT}"
-    networks:
-      - song_platform_network
 
 networks:
   song_platform_network:

@@ -1,4 +1,4 @@
-package com.microservices.saliiov.resource.processor.dto;
+package com.microservices.saliiov.resource.resource_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
