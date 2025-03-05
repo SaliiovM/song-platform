@@ -1,6 +1,6 @@
-package com.microservices.saliiov.resource.processor.service;
+package com.microservices.saliiov.resource.resource_service.service;
 
-import com.microservices.saliiov.resource.processor.dto.SongMetadata;
+import com.microservices.saliiov.resource.resource_service.dto.SongMetadata;
 import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;
 

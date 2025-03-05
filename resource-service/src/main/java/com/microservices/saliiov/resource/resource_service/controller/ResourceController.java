@@ -2,7 +2,7 @@ package com.microservices.saliiov.resource.resource_service.controller;
 
 import com.microservices.saliiov.resource.resource_service.dto.DeleteResponse;
 import com.microservices.saliiov.resource.resource_service.dto.ResponseId;
-import com.microservices.saliiov.resource.resource_service.facade.ResourceFacade;
+import com.microservices.saliiov.resource.resource_service.service.ResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -26,18 +26,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ResourceController {
 
-    private final ResourceFacade resourceFacade;
+    private final ResourceService resourceService;
 
     @PostMapping(consumes = "audio/mpeg")
     public ResponseEntity<ResponseId> createResources(@RequestBody byte[] audioData) {
         log.debug("Executing createResources");
-        return ResponseEntity.ok(ResponseId.builder().id(resourceFacade.createResource(audioData)).build());
+        return ResponseEntity.ok(ResponseId.builder().id(resourceService.createResource(audioData)).build());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ByteArrayResource> getResources(@PathVariable Long id) {
         log.debug("Executing getResources");
-        byte[] resourceDataById = resourceFacade.getResourceDataById(id);
+        byte[] resourceDataById = resourceService.getResourceDataById(id);
         return Optional.ofNullable(resourceDataById)
                 .map(bytes -> ResponseEntity.ok()
                         .contentType(MediaType.valueOf("audio/mpeg"))
@@ -50,7 +50,7 @@ public class ResourceController {
         log.debug("Executing deleteResources");
         return ResponseEntity.status(HttpStatus.OK)
                 .body(DeleteResponse.builder()
-                        .ids(resourceFacade.deleteResourcesByIds(id))
+                        .ids(resourceService.deleteResourcesByIds(id))
                         .build());
     }
 }
