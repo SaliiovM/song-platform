@@ -1,6 +1,6 @@
 package com.microservices.saliiov.resource.resource_service.controller;
 
-import com.microservices.saliiov.resource.resource_service.service.ResourceService;
+import com.microservices.saliiov.resource.resource_service.facade.ResourceFacade;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +25,12 @@ public class ResourceControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ResourceService resourceService;
+    private ResourceFacade resourceFacade;
 
     @Test
     public void testCreateResources() throws Exception {
         final Long mockId = 1L;
-        Mockito.when(resourceService.createResource(any(byte[].class))).thenReturn(mockId);
+        Mockito.when(resourceFacade.createResource(any(byte[].class))).thenReturn(mockId);
         MockMultipartFile file = new MockMultipartFile("audioData", "orig", "audio/mpeg", "mockaudio".getBytes());
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/resources")
@@ -44,7 +44,7 @@ public class ResourceControllerTest {
     @Test
     public void testGetResources() throws Exception {
         byte[] mockData = "mockAudioData".getBytes();
-        Mockito.when(resourceService.getResourceDataById(1L)).thenReturn(mockData);
+        Mockito.when(resourceFacade.getResourceDataById(1L)).thenReturn(mockData);
 
         mockMvc.perform(get("/resources/{id}", 1L))
                 .andExpect(status().isOk());
@@ -52,7 +52,7 @@ public class ResourceControllerTest {
 
     @Test
     public void testDeleteResource() throws Exception {
-        Mockito.when(resourceService.deleteResourcesByIds("1"))
+        Mockito.when(resourceFacade.deleteResourcesByIds("1"))
                 .thenReturn(Collections.singletonList(1L));
 
         mockMvc.perform(delete("/resources").param("id", "1"))

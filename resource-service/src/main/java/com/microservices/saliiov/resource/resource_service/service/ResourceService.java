@@ -1,7 +1,10 @@
 package com.microservices.saliiov.resource.resource_service.service;
 
 
+import com.microservices.saliiov.resource.resource_service.entity.Resource;
+
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service for working with resources
@@ -9,22 +12,23 @@ import java.util.List;
 public interface ResourceService {
     /**
      * Create resource
-     * @param data - resource data
+     * @param resource - resource data
      * @return - id of created resource
      */
-    Long createResource(byte[] data);
+    Long createResource(Resource resource);
 
     /**
      * Get resource data by id
      * @param id - resource id
-     * @return - resource data
+     * @return - optional of resource
      */
-    byte[] getResourceDataById(Long id);
+    Optional<Resource> getResourceById(Long id);
 
     /**
      * Delete resources by ids
+     *
      * @param ids - ids of resources
      * @return - ids of deleted resources
      */
-    List<Long> deleteResourcesByIds(String ids);
+    List<Resource> deleteResourcesByIds(String ids);
 }

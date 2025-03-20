@@ -1,6 +1,33 @@
 spring:
   application:
     name: resource-processor
+  cloud:
+    stream:
+      bindings:
+        processResourceMessage-in-0:
+          destination: ${MESSAGE_DESTINATION:resource-queue}
+          group: ${CONSUMER_GROUP:resource-group}
+          consumer:
+            max-attempts: 1
+  rabbitmq:
+    host: ${MQ_HOST:localhost}
+    port: ${MQ_CLIENT_PORT:5672}
+    username: ${MQ_USER:guest}
+    password: ${MQ_PASS:guest}
 
 server:
   port: ${PROCESSOR_SVC_PORT:8082}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_SVC_HOST:localhost}:${EUREKA_SVC_PORT:8761}/eureka
+  instance:
+    preferIpAddress: ${EUREKA_PREFER_IP_ADDRESS:true}
+
+resource-service-name: ${RESOURCE_SERVICE_NAME:resource-service}
+song-service-name: ${SONG_SERVICE_NAME:song-service}
+
+resource:
+  destination:
+    rollback: ${ROLLBACK_DESTINATION:resource-rollback-queue}

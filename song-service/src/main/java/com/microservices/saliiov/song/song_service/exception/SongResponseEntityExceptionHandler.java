@@ -18,6 +18,15 @@ public class SongResponseEntityExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(value = {SongExistsException.class})
+    public ResponseEntity<ResponseError> handleSongExistsException(SongExistsException e) {
+        log.error("SongValidationException", e);
+        return ResponseEntity.status(409)
+                .body(ResponseError.builder()
+                        .message(e.getMessage())
+                        .build());
+    }
+
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<ResponseError> handleException(Exception e) {
         log.error("Exception", e);

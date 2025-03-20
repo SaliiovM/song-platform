@@ -2,6 +2,7 @@ package com.microservices.saliiov.song.song_service.service.impl;
 
 import com.microservices.saliiov.song.song_service.dto.SongDto;
 import com.microservices.saliiov.song.song_service.entity.Song;
+import com.microservices.saliiov.song.song_service.exception.SongExistsException;
 import com.microservices.saliiov.song.song_service.exception.SongValidationException;
 import com.microservices.saliiov.song.song_service.repository.SongRepository;
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,7 @@ public class SongServiceImplTest {
 
         SongServiceImpl songService = new SongServiceImpl(songRepository);
 
-        assertThrows(SongValidationException.class, () -> songService.createSong(mockDto));
+        assertThrows(SongExistsException.class, () -> songService.createSong(mockDto));
     }
 
     @Test

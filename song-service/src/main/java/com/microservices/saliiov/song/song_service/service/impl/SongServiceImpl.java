@@ -2,6 +2,7 @@ package com.microservices.saliiov.song.song_service.service.impl;
 
 import com.microservices.saliiov.song.song_service.dto.SongDto;
 import com.microservices.saliiov.song.song_service.entity.Song;
+import com.microservices.saliiov.song.song_service.exception.SongExistsException;
 import com.microservices.saliiov.song.song_service.exception.SongValidationException;
 import com.microservices.saliiov.song.song_service.repository.SongRepository;
 import com.microservices.saliiov.song.song_service.service.SongService;
@@ -38,6 +39,15 @@ public class SongServiceImpl implements SongService {
         }
         log.info("Finding song by id: {}", id);
         return songRepository.findById(id).map(this::mapToSongDto);
+    }
+
+    @Override
+    public Optional<SongDto> findSongByResourceId(Long resourceId) {
+        if (Objects.isNull(resourceId)) {
+            throw new SongValidationException("Id is required");
+        }
+        log.info("Finding song by resourceId: {}", resourceId);
+        return songRepository.findByResourceId(resourceId).map(this::mapToSongDto);
     }
 
     @Override
@@ -91,7 +101,7 @@ public class SongServiceImpl implements SongService {
         }
 
         if (songRepository.findByNameAndSongYearAndArtist(dto.getName(), dto.getYear(), dto.getArtist()).isPresent()) {
-            throw new SongValidationException("Song already exists");
+            throw new SongExistsException("Song already exists");
         }
     }
 }
