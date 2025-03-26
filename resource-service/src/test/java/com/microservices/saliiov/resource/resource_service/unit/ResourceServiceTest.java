@@ -1,14 +1,16 @@
-package com.microservices.saliiov.resource.resource_service.service.impl;
+package com.microservices.saliiov.resource.resource_service.unit;
 
 import com.microservices.saliiov.resource.resource_service.entity.Resource;
 import com.microservices.saliiov.resource.resource_service.exception.ResourceValidationException;
-import com.microservices.saliiov.resource.resource_service.exception.S3ProcessingException;
 import com.microservices.saliiov.resource.resource_service.repository.ResourceRepository;
+import com.microservices.saliiov.resource.resource_service.service.ResourceService;
+import com.microservices.saliiov.resource.resource_service.service.impl.ResourceServiceImpl;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
@@ -25,14 +27,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@SpringBootTest(properties = "eureka.client.enabled=false")
-public class ResourceServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+public class ResourceServiceTest {
 
-    @MockBean
+    @Mock
     private ResourceRepository resourceRepository;
 
-    @Autowired
-    private ResourceServiceImpl resourceService;
+    private ResourceService resourceService;
+
+    @BeforeEach
+    public void setUp() {
+        resourceService = new ResourceServiceImpl(resourceRepository);
+    }
 
     @Test
     @SneakyThrows
@@ -59,11 +65,8 @@ public class ResourceServiceImplTest {
     @Test
     @SneakyThrows
     public void testCreateResource_WithError() {
-        Resource mockResource = new Resource();
-        when(resourceRepository.save(mockResource)).thenThrow(new S3ProcessingException("Error"));
-
         assertThrows(ResourceValidationException.class, () ->
-                resourceService.createResource(mockResource)
+                resourceService.createResource(new Resource())
         );
     }
 

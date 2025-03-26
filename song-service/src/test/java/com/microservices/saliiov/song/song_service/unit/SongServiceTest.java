@@ -1,10 +1,11 @@
-package com.microservices.saliiov.song.song_service.service.impl;
+package com.microservices.saliiov.song.song_service.unit;
 
 import com.microservices.saliiov.song.song_service.dto.SongDto;
 import com.microservices.saliiov.song.song_service.entity.Song;
 import com.microservices.saliiov.song.song_service.exception.SongExistsException;
 import com.microservices.saliiov.song.song_service.exception.SongValidationException;
 import com.microservices.saliiov.song.song_service.repository.SongRepository;
+import com.microservices.saliiov.song.song_service.service.impl.SongServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SongServiceImplTest {
+public class SongServiceTest {
 
     @Mock
     private SongRepository songRepository;
