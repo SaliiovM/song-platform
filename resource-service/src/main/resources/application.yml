@@ -54,3 +54,12 @@ s3:
 resource:
   destination:
     created: ${MESSAGE_DESTINATION:resource-queue}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always

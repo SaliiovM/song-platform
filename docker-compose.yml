@@ -12,6 +12,11 @@ services:
       - "${EUREKA_SVC_PORT}:${EUREKA_SVC_PORT}"
     networks:
       - song_platform_network
+    healthcheck:
+      test: "wget --no-verbose --spider localhost:${EUREKA_SVC_PORT}/actuator/health || exit 1"
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
 
   resource-svc:
     container_name: resource-svc
@@ -43,10 +48,19 @@ services:
     networks:
       - song_platform_network
     depends_on:
-      - resource-svc-db
-      - eureka-svc
-      - localstack
-      - rabbitmq-svc
+      resource-svc-db:
+        condition: service_healthy
+      eureka-svc:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      rabbitmq-svc:
+        condition: service_healthy
+    healthcheck:
+      test: "wget --no-verbose --spider localhost:${RESOURCE_SVC_PORT}/actuator/health || exit 1"
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
 
   resource-svc-db:
     container_name: resource-svc-db
@@ -62,6 +76,11 @@ services:
     volumes:
       - ./resource-service/init-db:/docker-entrypoint-initdb.d
       - resource-service-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${RESOURCE_DB_USER}" ]
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
 
   song-svc:
     image: song-service
@@ -82,10 +101,17 @@ services:
     networks:
       - song_platform_network
     depends_on:
-      - song-svc-db
-      - eureka-svc
+      song-svc-db:
+        condition: service_healthy
+      eureka-svc:
+        condition: service_healthy
     deploy:
       replicas: 2
+    healthcheck:
+      test: "wget --no-verbose --spider localhost:${SONG_SVC_PORT}/actuator/health || exit 1"
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
 
   song-svc-db:
     container_name: song-svc-db
@@ -101,6 +127,11 @@ services:
     volumes:
       - ./song-service/init-db:/docker-entrypoint-initdb.d
       - song-service-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${RESOURCE_DB_USER}" ]
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
 
   processor-svc:
     container_name: processor-svc
@@ -124,8 +155,15 @@ services:
     networks:
       - song_platform_network
     depends_on:
-      - rabbitmq-svc
-      - eureka-svc
+      rabbitmq-svc:
+        condition: service_healthy
+      eureka-svc:
+        condition: service_healthy
+    healthcheck:
+      test: "wget --no-verbose --spider localhost:${PROCESSOR_SVC_PORT}/actuator/health || exit 1"
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
 
   rabbitmq-svc:
     image: rabbitmq:management
@@ -136,6 +174,11 @@ services:
       - "${MQ_MANAGEMENT_PORT}:${MQ_MANAGEMENT_PORT}"
     networks:
       - song_platform_network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
 
   localstack:
     image: localstack/localstack
@@ -152,12 +195,18 @@ services:
       - "${CLOUD_PORT}:${CLOUD_PORT}"
     networks:
       - song_platform_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "${AWS_ENDPOINT}:${CLOUD_PORT}/_localstack/health" ]
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
 
   create-bucket:
     image: amazon/aws-cli
     container_name: create-bucket
     depends_on:
-      - localstack
+      localstack:
+        condition: service_healthy
     volumes:
       - ./service-scripts/create-bucket.sh:/create-bucket.sh
     env_file:
