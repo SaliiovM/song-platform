@@ -1,5 +1,6 @@
-package com.microservices.saliiov.resource.resource_service.controller;
+package com.microservices.saliiov.resource.resource_service.integration;
 
+import com.microservices.saliiov.resource.resource_service.controller.ResourceController;
 import com.microservices.saliiov.resource.resource_service.facade.ResourceFacade;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ResourceController.class)
-public class ResourceControllerTest {
+public class ResourceControllerTestIT {
 
     @Autowired
     private MockMvc mockMvc;

@@ -21,6 +21,8 @@
         <tika.version>2.9.2</tika.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <aspectjweaver.version>1.9.22</aspectjweaver.version>
+        <spring-cloud-contract.version>4.2.0</spring-cloud-contract.version>
+        <spring-test-binder.version>4.2.1</spring-test-binder.version>
     </properties>
 
     <dependencies>
@@ -67,6 +69,18 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers-standard-package</artifactId>
             <version>${tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
+            <version>${spring-cloud-contract.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-test-binder</artifactId>
+            <version>${spring-test-binder.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

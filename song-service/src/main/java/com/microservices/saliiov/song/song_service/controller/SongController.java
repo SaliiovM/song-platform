@@ -51,7 +51,7 @@ public class SongController {
     @DeleteMapping
     public ResponseEntity<DeleteResponse> deleteSongs(@RequestParam String id) {
         log.debug("Executing deleteSongs");
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(DeleteResponse.builder()
                         .ids(songService.deleteSongsByIds(id))
                         .build());

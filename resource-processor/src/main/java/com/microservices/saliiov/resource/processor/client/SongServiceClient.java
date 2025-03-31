@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @FeignClient(name = "${song-service-name}")
 public interface SongServiceClient {
-    @PostMapping("/songs")
+    @PostMapping(path = "/songs", consumes = "application/json", produces = "application/json")
     ResponseEntity<ResponseId> createSong(SongMetadata songMetadata);
 }
