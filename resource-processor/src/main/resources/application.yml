@@ -31,3 +31,12 @@ song-service-name: ${SONG_SERVICE_NAME:song-service}
 resource:
   destination:
     rollback: ${ROLLBACK_DESTINATION:resource-rollback-queue}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
