@@ -13,6 +13,7 @@
         <module>resource-service</module>
         <module>eureka-server</module>
         <module>resource-processor</module>
+        <module>gateway-service</module>
     </modules>
 
     <properties>

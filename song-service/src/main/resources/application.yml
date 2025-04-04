@@ -3,8 +3,8 @@ spring:
     name: song-service
   datasource:
     url: jdbc:postgresql://${SONG_DB_HOST:localhost}:${SONG_DB_PORT:5433}/songdb
-    username: ${SONG_DB_USERNAME}
-    password: ${SONG_DB_PASSWORD}
+    username: ${SONG_DB_USERNAME:postgres}
+    password: ${SONG_DB_PASSWORD:root}
   jpa:
     hibernate:
       ddl-auto: update
