@@ -3,8 +3,8 @@ spring:
     name: resource-service
   datasource:
     url: jdbc:postgresql://${RESOURCE_DB_HOST:localhost}:${RESOURCE_DB_PORT:5432}/resourcedb
-    username: ${RESOURCE_DB_USERNAME}
-    password: ${RESOURCE_DB_PASSWORD}
+    username: ${RESOURCE_DB_USERNAME:postgres}
+    password: ${RESOURCE_DB_PASSWORD:root}
   cloud:
     stream:
       bindings:

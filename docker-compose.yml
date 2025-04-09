@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 services:
   eureka-svc:
     container_name: eureka-svc
@@ -14,6 +14,55 @@ services:
       - song_platform_network
     healthcheck:
       test: "wget --no-verbose --spider localhost:${EUREKA_SVC_PORT}/actuator/health || exit 1"
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
+
+  config-svc:
+    container_name: config-svc
+    build:
+      context: ./config-service
+      dockerfile: Dockerfile
+    environment:
+      - CONF_SVC_PORT=${CONF_SVC_PORT}
+      - EUREKA_SVC_HOST=eureka-svc
+      - EUREKA_SVC_PORT=${EUREKA_SVC_PORT}
+      - EUREKA_PREFER_IP_ADDRESS=${EUREKA_PREFER_IP_ADDRESS}
+    ports:
+      - "${CONF_SVC_EXP_PORT}:${CONF_SVC_PORT}"
+    networks:
+      - song_platform_network
+    depends_on:
+      eureka-svc:
+        condition: service_healthy
+    healthcheck:
+      test: >
+        sh -c "(wget --no-verbose --spider localhost:${CONF_SVC_PORT}/actuator/health
+        && wget --no-verbose --spider http://eureka-svc:${EUREKA_SVC_PORT}/eureka/apps/config-service) || exit 1"
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
+      start_period: ${HEALTHCHECK_START_PERIOD}
+
+  gateway-svc:
+    container_name: gateway-svc
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    environment:
+      - CONFIG_SVC_HOST=config-svc
+      - CONFIG_SVC_PORT=${CONF_SVC_PORT}
+    ports:
+      - "${GATEWAY_SVC_EXP_PORT}:${GATEWAY_SVC_PORT}"
+    networks:
+      - song_platform_network
+    depends_on:
+      eureka-svc:
+        condition: service_healthy
+      config-svc:
+        condition: service_healthy
+    healthcheck:
+      test: "wget --no-verbose --spider localhost:${GATEWAY_SVC_PORT}/actuator/health || exit 1"
       interval: ${HEALTHCHECK_INTERVAL}
       timeout: ${HEALTHCHECK_TIMEOUT}
       retries: ${HEALTHCHECK_RETRIES}
