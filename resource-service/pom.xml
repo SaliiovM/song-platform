@@ -22,6 +22,7 @@
 		<aws.java.sdk.version>2.29.6</aws.java.sdk.version>
 		<contract.verifier.version>4.2.0</contract.verifier.version>
 		<spring-test-binder.version>4.2.1</spring-test-binder.version>
+		<circuitbreaker.version>2.1.0</circuitbreaker.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -39,6 +40,10 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.retry</groupId>
@@ -107,6 +112,15 @@
 			<artifactId>spring-cloud-stream-test-binder</artifactId>
 			<version>${spring-test-binder.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot3</artifactId>
+			<version>${circuitbreaker.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
 	</dependencies>
 

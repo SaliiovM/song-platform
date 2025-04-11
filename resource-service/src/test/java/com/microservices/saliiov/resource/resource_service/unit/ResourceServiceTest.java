@@ -46,7 +46,7 @@ public class ResourceServiceTest {
         Long expectedId = 1L;
         Resource mockResource = mock(Resource.class);
         when(mockResource.getId()).thenReturn(expectedId);
-        when(mockResource.getName()).thenReturn("mockData");
+        when(mockResource.getKey()).thenReturn("mockData");
         when(resourceRepository.save(any(Resource.class))).thenReturn(mockResource);
 
         Long resourceId = resourceService.createResource(mockResource);
@@ -74,14 +74,14 @@ public class ResourceServiceTest {
     public void testGetResourceById() {
         String expectedName = "mockData";
         Resource mockResource = mock(Resource.class);
-        when(mockResource.getName()).thenReturn(expectedName);
+        when(mockResource.getKey()).thenReturn(expectedName);
         when(resourceRepository.findById(anyLong())).thenReturn(Optional.of(mockResource));
 
         Optional<Resource> actualData = resourceService.getResourceById(1L);
 
         verify(resourceRepository, times(1)).findById(anyLong());
         assertTrue(actualData.isPresent());
-        assertEquals(expectedName, actualData.get().getName());
+        assertEquals(expectedName, actualData.get().getKey());
     }
 
     @Test

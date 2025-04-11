@@ -31,6 +31,7 @@ song-service-name: ${SONG_SERVICE_NAME:song-service}
 resource:
   destination:
     rollback: ${ROLLBACK_DESTINATION:resource-rollback-queue}
+    success: ${SUCCESS_DESTINATION:resource-success-queue}
 
 management:
   endpoints:
