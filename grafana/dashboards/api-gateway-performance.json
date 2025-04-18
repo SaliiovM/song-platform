@@ -1,0 +1,40 @@
+{
+  "id": null,
+  "title": "API Gateway Performance",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Request Count",
+      "targets": [
+        {
+          "expr": "sum(http_server_requests_seconds_count{job='GATEWAY-SERVICE'})",
+          "legendFormat": "Total Requests"
+        }
+      ]
+    },
+    {
+      "type": "gauge",
+      "title": "Average Latency",
+      "targets": [
+        {
+          "expr": "sum(http_server_requests_seconds_sum{job='GATEWAY-SERVICE'}) / sum(http_server_requests_seconds_count{job='GATEWAY-SERVICE'})",
+          "legendFormat": "Average Latency (s)"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Error Rates",
+      "targets": [
+        {
+          "expr": "sum(http_server_requests_seconds_count{job='GATEWAY-SERVICE', status=~'4..'})",
+          "legendFormat": "4xx Errors"
+        },
+        {
+          "expr": "sum(http_server_requests_seconds_count{job='GATEWAY-SERVICE', status=~'5..'})",
+          "legendFormat": "5xx Errors"
+        }
+      ]
+    }
+  ]
+}

@@ -21,6 +21,7 @@
         <aws.java.sdk.version>2.29.6</aws.java.sdk.version>
         <spring-cloud.version>2023.0.2</spring-cloud.version>
         <postgresql.version>42.7.3</postgresql.version>
+        <logstash-logback.version>7.2</logstash-logback.version>
     </properties>
 
     <dependencies>
@@ -78,6 +79,23 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash-logback.version}</version>
         </dependency>
     </dependencies>
 

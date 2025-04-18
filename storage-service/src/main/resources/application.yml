@@ -23,6 +23,10 @@ eureka:
       defaultZone: http://${EUREKA_SVC_HOST:localhost}:${EUREKA_SVC_PORT:8761}/eureka
   instance:
     preferIpAddress: ${EUREKA_PREFER_IP_ADDRESS:true}
+    metadataMap:
+      "prometheus.scrape": "true"
+      "prometheus.path": "/actuator/prometheus"
+      "prometheus.port": ${STORAGE_SVC_PORT:8080}
 
 storage:
   types:
@@ -41,7 +45,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health, info, prometheus
   endpoint:
     health:
       show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true

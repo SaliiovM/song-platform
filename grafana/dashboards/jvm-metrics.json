@@ -1,0 +1,57 @@
+{
+  "id": null,
+  "title": "JVM Metrics",
+  "panels": [
+    {
+      "type": "table",
+      "title": "Heap Memory Usage",
+      "targets": [
+        {
+          "expr": "(jvm_memory_used_bytes{area='heap'} / jvm_memory_max_bytes{area='heap'}) * 100",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Garbage Collection Pause Count",
+      "targets": [
+        {
+          "expr": "jvm_gc_pause_seconds_count",
+          "legendFormat": "GC Pause Count"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Live Threads",
+      "targets": [
+        {
+          "expr": "jvm_threads_live_threads",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "fields": "",
+          "calcs": ["last"]
+        },
+        "orientation": "horizontal"
+      }
+    }
+  ]
+}

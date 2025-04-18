@@ -22,6 +22,7 @@
 		<cucumber.version>7.14.0</cucumber.version>
 		<rest-assured.version>5.4.0</rest-assured.version>
 		<contract.verifier.version>4.2.0</contract.verifier.version>
+		<logstash-logback.version>7.2</logstash-logback.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -96,6 +97,23 @@
 			<artifactId>spring-cloud-starter-contract-verifier</artifactId>
 			<version>${contract.verifier.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-brave</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>${logstash-logback.version}</version>
 		</dependency>
 	</dependencies>
 
