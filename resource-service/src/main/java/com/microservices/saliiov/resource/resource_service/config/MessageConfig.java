@@ -21,4 +21,12 @@ public class MessageConfig {
             resourceFacade.deleteResourcesByIds(resource.getId());
         };
     }
+
+    @Bean
+    public Consumer<ResourceMessage> resourceCreationSuccess(ResourceFacade resourceFacade) {
+        return resource -> {
+            log.info("Processing success for resource: {}", resource);
+            resourceFacade.processSuccess(resource.getId());
+        };
+    }
 }

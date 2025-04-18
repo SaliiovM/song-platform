@@ -6,17 +6,18 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 
 /**
- * Service for sending messages to the rollback resource queue
+ * Service for sending messages
  */
 public interface MessageService {
     /**
-     * Send a message to the resource rollback queue that an error occurred
+     * Send message to the destination
      * @param resourceId the id of the created resource
+     * @param destination the destination queue
      */
     @Retryable(
             retryFor = {MessageHandlingException.class},
             backoff = @Backoff(delay = 7000))
-    void sendRollbackMessage(String resourceId);
+    void sendMessage(String resourceId, String destination);
 
     @Recover
     void recover(MessageHandlingException e, String resourceId);

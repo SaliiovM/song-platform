@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: storage-service
+  datasource:
+    url: jdbc:postgresql://${STORAGE_DB_HOST:localhost}:${STORAGE_DB_PORT:5433}/storagedb
+    username: ${STORAGE_DB_USERNAME:postgres}
+    password: ${STORAGE_DB_PASSWORD:root}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: ${STORAGE_SVC_PORT:8080}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_SVC_HOST:localhost}:${EUREKA_SVC_PORT:8761}/eureka
+  instance:
+    preferIpAddress: ${EUREKA_PREFER_IP_ADDRESS:true}
+
+storage:
+  types:
+    - storageType: STAGING
+      bucket: ${S3_AUDIO_BUCKET:audio-resources}
+      path: /staging
+    - storageType: PERMANENT
+      bucket: ${S3_AUDIO_BUCKET:audio-resources}
+      path: /permanent
+    - storageType: STUB
+      bucket: ${S3_AUDIO_BUCKET:audio-resources}
+      path: /fallback
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always

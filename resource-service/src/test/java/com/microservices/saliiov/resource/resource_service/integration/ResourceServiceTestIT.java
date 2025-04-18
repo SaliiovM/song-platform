@@ -39,13 +39,13 @@ public class ResourceServiceTestIT {
     @SneakyThrows
     public void testCreateResource() {
         Resource resource = new Resource();
-        resource.setName("Test Resource");
+        resource.setKey("Test Resource");
 
         Long resourceId = resourceService.createResource(resource);
 
         Optional<Resource> resourceById = resourceService.getResourceById(resourceId);
         assertTrue(resourceById.isPresent());
-        assertEquals(resource.getName(), resourceById.get().getName());
+        assertEquals(resource.getKey(), resourceById.get().getKey());
     }
 
     @Test
@@ -69,8 +69,8 @@ public class ResourceServiceTestIT {
 
     private List<Long> createResources() {
         List<Long> ids = new ArrayList<>();
-        ids.add(resourceService.createResource(Resource.builder().name("Test #1").build()));
-        ids.add(resourceService.createResource(Resource.builder().name("Test #2").build()));
+        ids.add(resourceService.createResource(Resource.builder().key("Test #1").build()));
+        ids.add(resourceService.createResource(Resource.builder().key("Test #2").build()));
         return ids;
     }
 

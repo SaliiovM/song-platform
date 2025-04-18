@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,6 +24,8 @@ import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRun
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -61,6 +64,12 @@ public class ResourceProcessorFacadeTestIT {
     @SpyBean
     private ResourceProcessorFacade resourceProcessorFacade;
 
+    @Value("${resource.destination.rollback}")
+    private String rollbackDestination;
+
+    @Value("${resource.destination.success}")
+    private String successDestination;
+
     @Test
     @SneakyThrows
     public void shouldProcessResource() {
@@ -73,7 +82,8 @@ public class ResourceProcessorFacadeTestIT {
         verify(resourceProcessorFacade, times(1)).processResource(ResourceMessage.builder().id(resourceId).build());
         verify(resourceClientService, times(1)).getResourceById(resourceId);
         verify(songClientService, times(1)).createSong(songMetadata);
-        verify(messageService, never()).sendRollbackMessage(resourceId);
+        verify(messageService, times(1)).sendMessage(resourceId, successDestination);
+        verify(messageService, never()).sendMessage(resourceId, rollbackDestination);
     }
 
     private SongMetadata getSongMetadata() {

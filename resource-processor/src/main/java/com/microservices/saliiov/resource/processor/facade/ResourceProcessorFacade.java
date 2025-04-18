@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.exception.TikaException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
@@ -27,6 +28,12 @@ public class ResourceProcessorFacade {
     private final MessageService messageService;
     private final AudioService audioService;
 
+    @Value("${resource.destination.rollback}")
+    private String rollbackDestination;
+
+    @Value("${resource.destination.success}")
+    private String successDestination;
+
     public void processResource(ResourceMessage resource) {
         String resourceId = resource.getId();
         log.info("Processing resource with id: {}", resourceId);
@@ -37,10 +44,11 @@ public class ResourceProcessorFacade {
                     SongMetadata songMetadata = getSongMetadata(resourceId, resources.get());
                     Long songId = songClientService.createSong(songMetadata);
                     log.info("Song created with id: {}", songId);
+                    messageService.sendMessage(resourceId, successDestination);
                 }
             } catch (Exception e) {
                 log.error("Failed to process resource with id: {}", resourceId, e);
-                messageService.sendRollbackMessage(resourceId);
+                messageService.sendMessage(resourceId, rollbackDestination);
             }
         } else {
             log.info("No resource with id: {}", resourceId);

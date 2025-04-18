@@ -28,7 +28,7 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     @Transactional
     public Long createResource(Resource resource) {
-        if (Objects.isNull(resource) || StringUtils.isBlank(resource.getName())) {
+        if (Objects.isNull(resource) || StringUtils.isBlank(resource.getKey())) {
             throw new ResourceValidationException("Resource data is empty");
         }
 

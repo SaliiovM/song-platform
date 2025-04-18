@@ -92,6 +92,9 @@ services:
       - MESSAGE_DESTINATION=${MESSAGE_DESTINATION}
       - ROLLBACK_DESTINATION=${ROLLBACK_DESTINATION}
       - ROLLBACK_CONSUMER_GROUP=${ROLLBACK_CONSUMER_GROUP}
+      - SUCCESS_DESTINATION=${SUCCESS_DESTINATION}
+      - SUCCESS_CONSUMER_GROUP=${SUCCESS_CONSUMER_GROUP}
+      - STORAGE_SERVICE_NAME=storage-service
     ports:
       - "${RESOURCE_SVC_EXP_PORT}:${RESOURCE_SVC_PORT}"
     networks:
@@ -177,7 +180,7 @@ services:
       - ./song-service/init-db:/docker-entrypoint-initdb.d
       - song-service-postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "${RESOURCE_DB_USER}" ]
+      test: [ "CMD", "pg_isready", "-U", "${SONG_DB_USER}" ]
       interval: ${HEALTHCHECK_INTERVAL}
       timeout: ${HEALTHCHECK_TIMEOUT}
       retries: ${HEALTHCHECK_RETRIES}
@@ -264,6 +267,56 @@ services:
     networks:
       - song_platform_network
 
+  storage-svc:
+    image: storage-service
+    build:
+      context: ./storage-service
+      dockerfile: Dockerfile
+    environment:
+      - STORAGE_SVC_PORT=${STORAGE_SVC_PORT}
+      - STORAGE_DB_HOST=storage-svc-db
+      - STORAGE_DB_PORT=${STORAGE_DB_SVC_PORT}
+      - STORAGE_DB_USERNAME=${STORAGE_DB_USER}
+      - STORAGE_DB_PASSWORD=${STORAGE_DB_PASS}
+      - S3_AUDIO_BUCKET=${S3_AUDIO_BUCKET}
+      - EUREKA_SVC_HOST=eureka-svc
+      - EUREKA_SVC_PORT=${EUREKA_SVC_PORT}
+      - EUREKA_PREFER_IP_ADDRESS=${EUREKA_PREFER_IP_ADDRESS}
+    ports:
+      - "${STORAGE_SVC_EXP_PORT}:${STORAGE_SVC_PORT}"
+    networks:
+      - song_platform_network
+    depends_on:
+      storage-svc-db:
+        condition: service_healthy
+      eureka-svc:
+        condition: service_healthy
+    healthcheck:
+      test: "wget --no-verbose --spider localhost:${STORAGE_SVC_PORT}/actuator/health || exit 1"
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
+
+  storage-svc-db:
+    container_name: storage-svc-db
+    image: postgres:12.19-alpine3.20
+    environment:
+      POSTGRES_USER: ${STORAGE_DB_USER}
+      POSTGRES_PASSWORD: ${STORAGE_DB_PASS}
+      POSTGRES_DB: storagedb
+    ports:
+      - "${STORAGE_DB_EXP_PORT}:${STORAGE_DB_SVC_PORT}"
+    networks:
+      - song_platform_network
+    volumes:
+      - ./storage-service/init-db:/docker-entrypoint-initdb.d
+      - storage-service-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${STORAGE_DB_USER}" ]
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
+
 networks:
   song_platform_network:
     driver: bridge
@@ -271,3 +324,4 @@ networks:
 volumes:
   song-service-postgres-data:
   resource-service-postgres-data:
+  storage-service-postgres-data:

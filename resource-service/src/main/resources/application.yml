@@ -11,6 +11,13 @@ spring:
         processRollback-in-0:
           destination: ${ROLLBACK_DESTINATION:resource-rollback-queue}
           group: ${ROLLBACK_CONSUMER_GROUP:resource-rollback-group}
+          function: processRollback
+        resourceCreationSuccess-in-0:
+          destination: ${SUCCESS_DESTINATION:resource-success-queue}
+          group: ${SUCCESS_CONSUMER_GROUP:resource-success-group}
+          function: resourceCreationSuccess
+    function:
+      definition: processRollback;resourceCreationSuccess
   jpa:
     hibernate:
       ddl-auto: update
@@ -63,3 +70,26 @@ management:
   endpoint:
     health:
       show-details: always
+
+storage-service-name: ${STORAGE_SERVICE_NAME:storage-service}
+
+resilience4j:
+    circuitbreaker:
+        configs:
+          default:
+            slidingWindowSize: 10
+            permittedNumberOfCallsInHalfOpenState: 3
+            slowCallDurationThreshold: 4s
+            slowCallRateThreshold: 90
+            failureRateThreshold: 50
+            waitDurationInOpenState: 10s
+            minimumNumberOfCalls: 5
+        instances:
+          storageService:
+            baseConfig: default
+
+storage:
+  stub:
+    storageType: STUB
+    bucket: ${S3_AUDIO_BUCKET:audio-resources}
+    path: /fallback

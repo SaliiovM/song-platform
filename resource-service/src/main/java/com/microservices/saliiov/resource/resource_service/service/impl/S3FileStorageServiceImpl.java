@@ -1,5 +1,6 @@
 package com.microservices.saliiov.resource.resource_service.service.impl;
 
+import com.microservices.saliiov.resource.resource_service.dto.Storage;
 import com.microservices.saliiov.resource.resource_service.exception.S3ProcessingException;
 import com.microservices.saliiov.resource.resource_service.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
@@ -26,23 +27,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class S3FileStorageServiceImpl implements FileStorageService {
 
+    private static final String KEY = "%s/%s";
     private final S3Client s3Client;
-    @Value("${s3.bucket-name}")
-    private String bucketName;
     @Value("${s3.content-type}")
     private String contentType;
 
     @Override
-    public String uploadFile(byte[] data) {
+    public String uploadFile(byte[] data, Storage storage) {
         try {
-            String fileName = UUID.randomUUID().toString();
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileName)
+            String key = String.format(KEY, storage.getPath(),  UUID.randomUUID());
+            s3Client.putObject(PutObjectRequest.builder()
+                    .bucket(storage.getBucket())
+                    .key(key)
                     .contentType(contentType)
-                    .build();
-            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(data));
-            return fileName;
+                    .build(), RequestBody.fromBytes(data));
+            return key;
         } catch (Exception e) {
             log.error("Failed to upload file to S3", e);
             throw new S3ProcessingException("Failed to upload file to S3");
@@ -50,18 +49,18 @@ public class S3FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public byte[] downloadFile(String fileName) {
-        log.info("Downloading file: {}", fileName);
+    public byte[] downloadFile(String key, Storage storage) {
+        log.info("Downloading file: {}", key);
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(fileName)
+                .bucket(storage.getBucket())
+                .key(key)
                 .build();
 
         try (ResponseInputStream<?> responseStream = s3Client.getObject(getObjectRequest)) {
             return responseStream.readAllBytes();
         } catch (NoSuchKeyException e) {
-            log.error("The specified file does not exist: {}", fileName, e);
-            throw new S3ProcessingException("The specified file does not exist: " + fileName);
+            log.error("The specified file does not exist: {}", key, e);
+            throw new S3ProcessingException("The specified file does not exist: " + key);
         } catch (IOException e) {
             log.error("Error while reading the file data from S3", e);
             throw new S3ProcessingException("Error while reading the file data from S3");
@@ -69,14 +68,12 @@ public class S3FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public void deleteFiles(List<String> keys) {
-        List<ObjectIdentifier> objectsToDelete = keys.stream()
-                .map(key -> ObjectIdentifier.builder().key(key).build())
-                .collect(Collectors.toList());
-
+    public void deleteFiles(List<String> keys, Storage storage) {
         DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
-                .bucket(bucketName)
-                .delete(builder -> builder.objects(objectsToDelete))
+                .bucket(storage.getBucket())
+                .delete(builder -> builder.objects(keys.stream()
+                        .map(key -> ObjectIdentifier.builder().key(key).build())
+                        .collect(Collectors.toList())))
                 .build();
 
         try {
@@ -89,12 +86,25 @@ public class S3FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public void deleteFile(String key) {
+    public void deleteFile(String key, Storage storage) {
         try {
-            s3Client.deleteObject(builder -> builder.bucket(bucketName).key(key));
+            s3Client.deleteObject(builder -> builder.bucket(storage.getBucket()).key(key));
         } catch (Exception e) {
             log.error("Failed to delete file from S3", e);
             throw new S3ProcessingException("Failed to delete file from S3");
+        }
+    }
+
+    @Override
+    public String moveFile(String key, Storage from, Storage to) {
+        try {
+            byte[] data = downloadFile(key, from);
+            String newKey = uploadFile(data, to);
+            deleteFile(key, from);
+            return newKey;
+        } catch (Exception e) {
+            log.error("Failed to move file in S3", e);
+            throw new S3ProcessingException("Failed to move file in S3");
         }
     }
 }
