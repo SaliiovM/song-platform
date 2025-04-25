@@ -23,6 +23,7 @@
 		<contract.verifier.version>4.2.0</contract.verifier.version>
 		<spring-test-binder.version>4.2.1</spring-test-binder.version>
 		<circuitbreaker.version>2.1.0</circuitbreaker.version>
+		<logstash-logback.version>7.2</logstash-logback.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -52,6 +53,18 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-brave</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
@@ -121,6 +134,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>${logstash-logback.version}</version>
 		</dependency>
 	</dependencies>
 
