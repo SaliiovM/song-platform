@@ -2,7 +2,7 @@ spring:
   application:
     name: storage-service
   datasource:
-    url: jdbc:postgresql://${STORAGE_DB_HOST:localhost}:${STORAGE_DB_PORT:5433}/storagedb
+    url: jdbc:postgresql://${STORAGE_DB_HOST:localhost}:${STORAGE_DB_PORT:5434}/storagedb
     username: ${STORAGE_DB_USERNAME:postgres}
     password: ${STORAGE_DB_PASSWORD:root}
   jpa:
@@ -13,6 +13,11 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JWK_SET_URI:http://localhost:8046/api/auth/oauth2/jwks}
 
 server:
   port: ${STORAGE_SVC_PORT:8080}

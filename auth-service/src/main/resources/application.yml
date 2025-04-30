@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: auth-service
+
+server:
+  port: ${AUTH_SVC_PORT:8046}
+  servlet:
+    context-path: /api/auth
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_SVC_HOST:localhost}:${EUREKA_SVC_PORT:8761}/eureka
+  instance:
+    preferIpAddress: ${EUREKA_PREFER_IP_ADDRESS:true}
+
+user-client:
+  id: ${CLIENT_ID:client}
+  secret: ${CLIENT_SECRET:secret}
+  redirect-uri: ${REDIRECT_URI:http://localhost:8899}
+  scope: ${CLIENT_SCOPE:openid}
+
+resource-client:
+  id: ${RESOURCE_CLIENT_ID:resource-service-client}
+  secret: ${RESOURCE_CLIENT_SECRET:resource-service-secret}
+  scopes:
+    - storage:read
+    - storage:write
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always

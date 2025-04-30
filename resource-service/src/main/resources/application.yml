@@ -31,6 +31,18 @@ spring:
     port: ${MQ_CLIENT_PORT:5672}
     username: ${MQ_USER:guest}
     password: ${MQ_PASS:guest}
+  security:
+    oauth2:
+      client:
+        registration:
+          storage-service:
+            client-id: ${RESOURCE_CLIENT_ID:resource-service-client}
+            client-secret: ${RESOURCE_CLIENT_SECRET:resource-service-secret}
+            authorization-grant-type: client_credentials
+            scope: storage:read,storage:write
+        provider:
+          storage-service:
+            token-uri: ${TOKEN_URI:http://localhost:8046/api/auth/oauth2/token}
 
 server:
   port: ${RESOURCE_SVC_PORT:8080}

@@ -44,6 +44,35 @@ services:
       retries: ${HEALTHCHECK_RETRIES}
       start_period: ${HEALTHCHECK_START_PERIOD}
 
+  auth-svc:
+    container_name: auth-svc
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    environment:
+      - AUTH_SVC_PORT=${AUTH_SVC_PORT}
+      - EUREKA_SVC_HOST=eureka-svc
+      - EUREKA_SVC_PORT=${EUREKA_SVC_PORT}
+      - EUREKA_PREFER_IP_ADDRESS=${EUREKA_PREFER_IP_ADDRESS}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - REDIRECT_URI=${REDIRECT_URI}
+      - CLIENT_SCOPE=${CLIENT_SCOPE}
+      - RESOURCE_CLIENT_ID=${RESOURCE_CLIENT_ID}
+      - RESOURCE_CLIENT_SECRET=${RESOURCE_CLIENT_SECRET}
+    ports:
+      - "${AUTH_SVC_EXP_PORT}:${AUTH_SVC_PORT}"
+    networks:
+      - song_platform_network
+    depends_on:
+      eureka-svc:
+        condition: service_healthy
+    healthcheck:
+      test: "wget --no-verbose --spider localhost:${AUTH_SVC_PORT}/actuator/health || exit 1"
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
+
   gateway-svc:
     container_name: gateway-svc
     build:
@@ -95,6 +124,7 @@ services:
       - SUCCESS_DESTINATION=${SUCCESS_DESTINATION}
       - SUCCESS_CONSUMER_GROUP=${SUCCESS_CONSUMER_GROUP}
       - STORAGE_SERVICE_NAME=storage-service
+      - TOKEN_URI=http://auth-svc:${AUTH_SVC_PORT}/api/auth/oauth2/token
     ports:
       - "${RESOURCE_SVC_EXP_PORT}:${RESOURCE_SVC_PORT}"
     networks:
@@ -282,6 +312,7 @@ services:
       - EUREKA_SVC_HOST=eureka-svc
       - EUREKA_SVC_PORT=${EUREKA_SVC_PORT}
       - EUREKA_PREFER_IP_ADDRESS=${EUREKA_PREFER_IP_ADDRESS}
+      - JWK_SET_URI=http://auth-svc:${AUTH_SVC_PORT}/api/auth/oauth2/jwks
     ports:
       - "${STORAGE_SVC_EXP_PORT}:${STORAGE_SVC_PORT}"
     networks:
