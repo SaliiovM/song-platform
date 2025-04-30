@@ -68,7 +68,7 @@ services:
       eureka-svc:
         condition: service_healthy
     healthcheck:
-      test: "wget --no-verbose --spider localhost:${AUTH_SVC_PORT}/actuator/health || exit 1"
+      test: "wget --no-verbose --spider localhost:${AUTH_SVC_PORT}/api/auth/actuator/health || exit 1"
       interval: ${HEALTHCHECK_INTERVAL}
       timeout: ${HEALTHCHECK_TIMEOUT}
       retries: ${HEALTHCHECK_RETRIES}
