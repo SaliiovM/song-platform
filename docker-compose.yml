@@ -60,6 +60,7 @@ services:
       - CLIENT_SCOPE=${CLIENT_SCOPE}
       - RESOURCE_CLIENT_ID=${RESOURCE_CLIENT_ID}
       - RESOURCE_CLIENT_SECRET=${RESOURCE_CLIENT_SECRET}
+      - ISSUER_URI=http://auth-svc:${AUTH_SVC_PORT}/api/auth
     ports:
       - "${AUTH_SVC_EXP_PORT}:${AUTH_SVC_PORT}"
     networks:
@@ -313,6 +314,7 @@ services:
       - EUREKA_SVC_PORT=${EUREKA_SVC_PORT}
       - EUREKA_PREFER_IP_ADDRESS=${EUREKA_PREFER_IP_ADDRESS}
       - JWK_SET_URI=http://auth-svc:${AUTH_SVC_PORT}/api/auth/oauth2/jwks
+      - ISSUER_URI=http://auth-svc:${AUTH_SVC_PORT}/api/auth
     ports:
       - "${STORAGE_SVC_EXP_PORT}:${STORAGE_SVC_PORT}"
     networks:
