@@ -1,12 +1,17 @@
 package com.microservices.saliiov.resource.resource_service.integration;
 
+import com.microservices.saliiov.resource.resource_service.config.SecurityConfig;
 import com.microservices.saliiov.resource.resource_service.controller.ResourceController;
+import com.microservices.saliiov.resource.resource_service.exception.ResourceResponseEntityExceptionHandler;
 import com.microservices.saliiov.resource.resource_service.facade.ResourceFacade;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -19,7 +24,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ResourceController.class)
+@WebMvcTest(
+        controllers = ResourceController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = ResourceResponseEntityExceptionHandler.class
+        )
+)
+@Import(SecurityConfig.class)
 public class ResourceControllerTestIT {
 
     @Autowired
