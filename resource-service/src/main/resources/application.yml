@@ -43,6 +43,7 @@ spring:
         provider:
           storage-service:
             token-uri: ${TOKEN_URI:http://localhost:8046/api/auth/oauth2/token}
+#            issuer-uri: ${ISSUER_URI:http://localhost:8046/api/auth}
 
 server:
   port: ${RESOURCE_SVC_PORT:8080}

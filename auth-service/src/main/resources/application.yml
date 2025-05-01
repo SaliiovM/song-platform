@@ -34,3 +34,5 @@ management:
   endpoint:
     health:
       show-details: always
+
+auth-server-issuer-uri: ${ISSUER_URI:http://localhost:8046/api/auth}

@@ -18,6 +18,7 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${JWK_SET_URI:http://localhost:8046/api/auth/oauth2/jwks}
+          issuer-uri: ${ISSUER_URI:http://localhost:8046/api/auth}
 
 server:
   port: ${STORAGE_SVC_PORT:8080}
